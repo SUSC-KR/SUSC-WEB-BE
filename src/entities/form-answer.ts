@@ -6,6 +6,9 @@ export class FormAnswer {
   id!: string;
 
   @Property()
+  formId!: string;
+
+  @Property()
   @Index({ name: 'idx_form_answer_email' })
   email!: string;
 

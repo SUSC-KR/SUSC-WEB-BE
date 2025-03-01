@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  Param,
   Post,
   Query,
   Res,
@@ -31,20 +32,22 @@ export class AnswerController {
     private readonly formAnswerRepository: EntityRepository<FormAnswer>,
   ) {}
 
-  @Post('/answers/check-submitted')
+  @Post('/forms/:formId/answers/check-submitted')
   async checkSubmitted(
+    @Param('formId') formId: string,
     @Body() dto: CheckSubmittedRequestDto,
   ): Promise<CheckSubmittedResponseDto> {
     const { email } = dto;
 
-    const answer = await this.formAnswerRepository.findOne({ email });
+    const answer = await this.formAnswerRepository.findOne({ formId, email });
     const isSubmitted = !!answer;
 
     return new CheckSubmittedResponseDto(isSubmitted);
   }
 
-  @Post('/answers')
+  @Post('/forms/:formId/answers')
   async submitAnswer(
+    @Param('formId') formId: string,
     @Body() dto: SubmitAnswerRequestDto,
   ): Promise<SubmitAnswerResponseDto> {
     const { email, data } = dto;
@@ -56,6 +59,7 @@ export class AnswerController {
 
     const answer = this.formAnswerRepository.create({
       id: ulid(),
+      formId,
       email,
       data,
       createdAt: new Date(),
@@ -65,10 +69,10 @@ export class AnswerController {
     return answer;
   }
 
-  @Post('/answers/export-to-csv')
+  @Post('/forms/:formId/answers/export-to-csv')
   @UseManagerToken()
-  async exportCsv(@Res() res: Response) {
-    const answers = await this.formAnswerRepository.findAll();
+  async exportCsv(@Param('formId') formId: string, @Res() res: Response) {
+    const answers = await this.formAnswerRepository.find({ formId });
 
     const rows = answers.map((answer) => [
       answer.id,
@@ -86,13 +90,16 @@ export class AnswerController {
     res.download(path.resolve(__dirname, 'result.csv'), 'result.csv');
   }
 
-  @Delete('/answers')
+  @Delete('/forms/:formId/answers')
   @UseManagerToken()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Query() dto: DeleteAnswerRequestDto): Promise<void> {
+  async delete(
+    @Param('formId') formId: string,
+    @Query() dto: DeleteAnswerRequestDto,
+  ): Promise<void> {
     const { email } = dto;
 
-    const answer = await this.formAnswerRepository.findOne({ email });
+    const answer = await this.formAnswerRepository.findOne({ formId, email });
     if (!answer) {
       throw new NotFoundException('Answer not found');
     }
