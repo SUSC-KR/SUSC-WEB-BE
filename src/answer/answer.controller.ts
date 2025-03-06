@@ -52,7 +52,7 @@ export class AnswerController {
   ): Promise<SubmitAnswerResponseDto> {
     const { email, data } = dto;
 
-    const prevAnswer = await this.formAnswerRepository.findOne({ email });
+    const prevAnswer = await this.formAnswerRepository.findOne({ formId, email });
     if (prevAnswer) {
       throw new UnprocessableEntityException('Answer already submitted');
     }
