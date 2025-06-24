@@ -16,7 +16,7 @@ $ npm install
 ## 개발용 실행
 
 ```sh
-$ npm instal start:dev
+$ npm run start:dev
 ```
 
 ## 프로덕션용 실행
@@ -125,7 +125,24 @@ npm run schema:update
 
 ## 환경변수
 
+### 기본 설정
+
 |      이름       | 설명                            | 필수 |
 | :-------------: | :------------------------------ | :--: |
 |    `API_KEY`    | 일반 유저용 API 인증을 위한 key |  O   |
 | `MANAGER_TOKEN` | 관리자용 API 인증을 위한 key    |  O   |
+
+### Discord 리포트 설정
+
+|         이름         | 설명                                                                                  | 필수 | 기본값              |
+| :------------------: | :------------------------------------------------------------------------------------ | :--: | :------------------ |
+| `DISCORD_BOT_TOKEN`  | Discord 봇 토큰                                                                       |  O   | -                   |
+| `DISCORD_CHANNEL_ID` | 리포트를 전송할 Discord 채널 ID                                                       |  O   | -                   |
+|  `DISCORD_GUILD_ID`  | Discord 서버(길드) ID                                                                 |  O   | -                   |
+|  `REPORT_WEEKDAYS`   | 리포트 전송 요일 (쉼표로 구분, SUN/MON/TUE/WED/THU/FRI/SAT, 대소문자 무관, 중복 불가) |  X   | MON,TUE,WED,THU,FRI |
+
+#### 리포트 스케줄
+
+- **실행 시간**: 매일 KST 22:00 (오후 10시)
+- **실행 요일**: `REPORT_WEEKDAYS` 환경변수에 설정된 요일에만 실행
+- **리포트 내용**: formId별 응답 수를 Discord 임베드 메시지로 전송
